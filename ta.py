@@ -8,22 +8,26 @@ import requests
 
 from time import sleep
 
+# URL base of trip advisor
+URLBASE = "https://www.tripadvisor.it"
+
+# Url of the roman restaurants
+URL = "/Restaurants-g187791-Rome_Lazio.html"
+
 
 # Get a restaurant property
 def get_single_restaurant_prop(soap, container_dom, container_class, child_dom, child_class):
+
     # Find the prop wrapper
-    container = soap.find(container_dom, {"class": container_class})
-
-    # Find the property
-    prop = container.find(child_dom, {"class": child_class})
-
-    return prop.text
+    if soap.find(container_dom, {"class": container_class}):
+        container = soap.find(container_dom, {"class": container_class})
+        # Find the property
+        if container.find(child_dom, {"class": child_class}):
+            return container.find(child_dom, {"class": child_class}).text
+    return "N/A"
 
 
 def get_single_restaurant(url_rest):
-    # TODO
-    print(url_rest)
-
     # Navigate the restaurant single page
     single_restaurant_page = requests.get(URLBASE + url_rest)
 
@@ -35,26 +39,16 @@ def get_single_restaurant(url_rest):
     address = get_single_restaurant_prop(soap, "div", "address", "span", "detail")
     phone = get_single_restaurant_prop(soap, "div", "phone", "span", "detail")
 
-    # Display the restaurant name
-    print(name)
-
-    print(address)
-
-    print(phone)
+    info = "\nNome: {}\nIndirizzo: {}\nTelefono: {}"
+    print(info.format(name, address, phone))
 
     pass
 
 
-# URL base of trip advisor
-URLBASE = "https://www.tripadvisor.it"
-
-# Url of the roman restaurants
-url = "/Restaurants-g187791-Rome_Lazio.html"
-
 # Infinite loop
 while True:
     # Request the roman restaurant html page
-    page = requests.get(URLBASE + url)
+    page = requests.get(URLBASE + URL)
 
     # Parse the html page
     soup = BeautifulSoup(page.text, "html.parser")
@@ -75,7 +69,7 @@ while True:
     # Find the next button to have the link for next list of restaurant
     next_page = soup.find("a", {"class": "next"})
 
-    url = next_page.attrs['href']
+    URL = next_page.attrs['href']
 
     # Sleep to avoid too much requests and be banned from server
     sleep(2)
