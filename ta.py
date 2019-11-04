@@ -1,6 +1,6 @@
 # https://www.tripadvisor.it/Restaurants-g187791-Rome_Lazio.html
 
-# import BeautyfulSoap library
+# import BeautifulSoap library
 from bs4 import BeautifulSoup
 
 # import requests lib to make possibile http requests
@@ -17,7 +17,6 @@ URL = "/Restaurants-g187791-Rome_Lazio.html"
 
 # Get a restaurant property
 def get_single_restaurant_prop(soap, container_dom, container_class, child_dom, child_class):
-
     # Find the prop wrapper
     if soap.find(container_dom, {"class": container_class}):
         container = soap.find(container_dom, {"class": container_class})
@@ -27,6 +26,16 @@ def get_single_restaurant_prop(soap, container_dom, container_class, child_dom, 
     return "N/A"
 
 
+# Get the list of reviews
+def get_single_restaurant_reviews(soap):
+    reviews = soap.find_all("p", {"class": "partial_entry"})
+
+    for review in reviews:
+        print("- " + review.text + "\n")
+        sleep(1)
+
+
+# Get single restaurant
 def get_single_restaurant(url_rest):
     # Navigate the restaurant single page
     single_restaurant_page = requests.get(URLBASE + url_rest)
@@ -38,9 +47,17 @@ def get_single_restaurant(url_rest):
     name = get_single_restaurant_prop(soap, "div", "restaurantName", "h1", "h1")
     address = get_single_restaurant_prop(soap, "div", "address", "span", "detail")
     phone = get_single_restaurant_prop(soap, "div", "phone", "span", "detail")
+    score = get_single_restaurant_prop(
+        soap,
+        "div",
+        "restaurants-detail-overview-cards-RatingsOverviewCard__primaryRatingRow--VhEsu",
+        "span",
+        "restaurants-detail-overview-cards-RatingsOverviewCard__overallRating--nohTl")
 
-    info = "\nNome: {}\nIndirizzo: {}\nTelefono: {}"
-    print(info.format(name, address, phone))
+    info = "\nNome: {}\nIndirizzo: {}\nTelefono: {}\nPunteggio: {}\n"
+    print(info.format(name, address, phone, score))
+
+    get_single_restaurant_reviews(soap)
 
     pass
 
