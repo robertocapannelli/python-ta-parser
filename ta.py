@@ -3,6 +3,9 @@
 # import BeautifulSoap library
 from bs4 import BeautifulSoup
 
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
 # import requests lib to make possibile http requests
 import requests
 
@@ -13,6 +16,9 @@ URLBASE = "https://www.tripadvisor.it"
 
 # Url of the roman restaurants
 URL = "/Restaurants-g187791-Rome_Lazio.html"
+
+# Create instance of firefox webdriver
+driver = webdriver.Firefox()
 
 
 # Get a restaurant property
@@ -57,6 +63,13 @@ def get_single_restaurant(url_rest):
     info = "\nNome: {}\nIndirizzo: {}\nTelefono: {}\nPunteggio: {}\n"
     print(info.format(name, address, phone, score))
 
+    driver.get(URLBASE + url_rest)
+
+    # Get the more button
+    more = driver.find_elements_by_css_selector(".partial_entry span.taLnk")
+
+    if len(more) != 0:
+        more[0].click()
     get_single_restaurant_reviews(soap)
 
     pass
