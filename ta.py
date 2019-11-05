@@ -33,7 +33,14 @@ def get_single_restaurant_prop(soap, container_dom, container_class, child_dom, 
 
 
 # Get the list of reviews
-def get_single_restaurant_reviews(soap):
+def get_single_restaurant_reviews(soap, url_rest):
+    driver.get(URLBASE + url_rest)
+
+    # Get the more button
+    more = driver.find_elements_by_css_selector(".partial_entry span.taLnk")
+
+    if len(more) != 0:
+        more[0].click()
     reviews = soap.find_all("p", {"class": "partial_entry"})
 
     for review in reviews:
@@ -63,14 +70,7 @@ def get_single_restaurant(url_rest):
     info = "\nNome: {}\nIndirizzo: {}\nTelefono: {}\nPunteggio: {}\n"
     print(info.format(name, address, phone, score))
 
-    driver.get(URLBASE + url_rest)
-
-    # Get the more button
-    more = driver.find_elements_by_css_selector(".partial_entry span.taLnk")
-
-    if len(more) != 0:
-        more[0].click()
-    get_single_restaurant_reviews(soap)
+    get_single_restaurant_reviews(soap, url_rest)
 
     pass
 
